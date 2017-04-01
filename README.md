@@ -26,7 +26,7 @@ Please use Yarn. Some of us use an NPM caching server (Sinopia, usually) at work
 
 Unlike the main Pawar repo, we'll be all working on/from this one, not individual forks. There are fewer people and moving parts involved in this one. This will also help us maintain changes that propogate through each template and keep up with new templates as they're added. The `master` branch is protected and all work should be done on branches and through pull requests.
 
-Branches should be your github name or your name (stay consistent) and what the branch is. Such as `<micada-cta-template>` or `<malaniz-fixing-gulp>`, so we know how to ask when we inevitably need to clean up branches. Once your pull request is merged, please delete your branch remotely. You can keep it locally, and even push again to it to create a new Pull Request. Note that your local will likely get all overloaded with branches and you should just mind that for your sanity.
+Branches should be your github name or your name (stay consistent) and what the branch is. Such as `<micada-cta-template>` or `<malaniz-fixing-gulp>`, so we know who to ask when we inevitably need to clean up branches. Once your pull request is merged, please delete your branch remotely. You can keep it locally, and even push again to it to create a new Pull Request. Note that your local will likely get all overloaded with branches and you should just mind that for your sanity.
 
 To start your local repo:
 
