@@ -22,7 +22,7 @@ Secondly install [Yarn](https://yarnpkg.com/en/docs/install).
 
 Please use Yarn. Some of us use an NPM caching server (Sinopia, usually) at work which seems not to support scoping and therefore recent versions of dependencies for this project error out at install. So either we use Yarn or NPM shrinkwrap. I chose Yarn.
 
-### Git Setup
+## Git Setup
 
 Unlike the main Pawar repo, we'll be all working on/from this one, not individual forks. There are fewer people and moving parts involved in this one. This will also help us maintain changes that propogate through each template and keep up with new templates as they're added. The `master` branch is protected and all work should be done on branches and through pull requests.
 
