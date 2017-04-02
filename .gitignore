@@ -7,3 +7,4 @@ dist
 .awspublish*
 config.json
 yarn-error.log
+example.config.json
