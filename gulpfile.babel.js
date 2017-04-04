@@ -81,9 +81,17 @@ function images() {
 // Inline CSS and minify HTML
 function inline() {
   return gulp.src('dist/**/*.html')
-    .pipe($.tap(function(file, t) {
-      inliner('dist/css/' +  path.basename(file.path, '.html') + '.css')
-    }))
+    .pipe($.if(PRODUCTION, $.foreach(function(stream, file) {
+      var name = path.parse(file.path).name;
+      if (fs.existsSync('dist/css/' + name + '.css') === false) {
+        fs.appendFile('dist/css/' + name + '.css', '', function(err) {
+          if (err) {
+            console.log(err);
+          }
+        })
+      }
+      return stream.pipe(inliner('dist/css/' + name + '.css'));
+    })))
     .pipe(gulp.dest('dist'))
 }
 
@@ -107,18 +115,18 @@ function watch() {
 
 // Inlines CSS into HTML, adds media query CSS into the <style> tag of the email, and compresses the HTML
 function inliner(css) {
-  var css = fs.readFileSync(css).toString();
-  var mqCss = siphon(css);
+  var newCss = fs.readFileSync(css).toString();
+  var mqCss = siphon(newCss);
 
   var pipe = lazypipe()
     .pipe($.inlineCss, {
       applyStyleTags: false,
       removeStyleTags: true,
       preserveMediaQueries: true,
-      removeLinkTags: false
+      removeLinkTags: false,
+      applyTableAttributes: true,
     })
     .pipe($.replace, '<!-- <style> -->', `<style>${mqCss}</style>`)
-    .pipe($.replace, '<link rel="stylesheet" type="text/css" href="css/app.css">', '')
     .pipe($.htmlmin, {
       collapseWhitespace: true,
       minifyCSS: true
