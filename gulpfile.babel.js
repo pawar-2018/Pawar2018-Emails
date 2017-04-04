@@ -81,17 +81,17 @@ function images() {
 // Inline CSS and minify HTML
 function inline() {
   return gulp.src('dist/**/*.html')
-    .pipe($.if(PRODUCTION, $.foreach(function(stream, file) {
+    .pipe($.foreach(function(stream, file) {
       var name = path.parse(file.path).name;
       if (fs.existsSync('dist/css/' + name + '.css') === false) {
-        fs.appendFile('dist/css/' + name + '.css', '', function(err) {
+        fs.appendFileSync('dist/css/' + name + '.css', '', function(err) {
           if (err) {
             console.log(err);
           }
         })
       }
       return stream.pipe(inliner('dist/css/' + name + '.css'));
-    })))
+    }))
     .pipe(gulp.dest('dist'))
 }
 
