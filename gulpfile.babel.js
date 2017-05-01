@@ -6,7 +6,7 @@ import panini   from 'panini';
 import yargs    from 'yargs';
 import lazypipe from 'lazypipe';
 import inky     from 'inky';
-import fs       from 'fs';
+import fs       from 'fs-extra';
 import siphon   from 'siphon-media-query';
 import path     from 'path';
 import merge    from 'merge-stream';
@@ -59,7 +59,7 @@ function resetPages(done) {
 // Compile Sass into CSS
 function sass() {
   return gulp.src('src/assets/scss/**/*.scss')
-    .pipe($.if(!PRODUCTION, $.sourcemaps.init()))
+    // .pipe($.if(!PRODUCTION, $.sourcemaps.init()))
     .pipe($.sass({
       includePaths: ['node_modules/foundation-emails/scss']
     }).on('error', $.sass.logError))
@@ -67,7 +67,7 @@ function sass() {
       {
         html: ['dist/**/*.html']
       })))
-    .pipe($.if(!PRODUCTION, $.sourcemaps.write()))
+    // .pipe($.if(!PRODUCTION, $.sourcemaps.write()))
     .pipe(gulp.dest('dist/css'));
 }
 
@@ -81,39 +81,15 @@ function images() {
 // Inline CSS and minify HTML
 function inline() {
   return gulp.src('dist/**/*.html')
+    .pipe($.debug({title: 'unicorn:'}))
     .pipe($.foreach(function(stream, file) {
       var name = path.parse(file.path).name;
-      if (fs.existsSync('dist/css/' + name + '.css') === false) {
-        fs.appendFileSync('dist/css/' + name + '.css', '', function(err) {
-          if (err) {
-            console.log(err);
-          }
-        })
-      }
+      fs.ensureFileSync('dist/css/' + name + '.css');
       return stream.pipe(inliner('dist/css/' + name + '.css'));
     }))
-    .pipe(gulp.dest('dist'))
+    .pipe(gulp.dest('dist'));
 }
 
-// Start a server with LiveReload to preview the site in
-function server(done) {
-  browser.init({
-    server: "dist",
-    startPath: "/index.html",
-    reloadOnRestart: true
-  });
-  done();
-}
-
-// Watch for file changes
-function watch() {
-  gulp.watch('src/pages/**/*.html').on('all', gulp.series(pages, inline, browser.reload));
-  gulp.watch(['src/layouts/**/*', 'src/partials/**/*']).on('all', gulp.series(resetPages, pages, inline, browser.reload));
-  gulp.watch(['../scss/**/*.scss', 'src/assets/scss/**/*.scss']).on('all', gulp.series(resetPages, sass, pages, inline, browser.reload));
-  gulp.watch('src/assets/img/**/*').on('all', gulp.series(images, browser.reload));
-}
-
-// Inlines CSS into HTML, adds media query CSS into the <style> tag of the email, and compresses the HTML
 function inliner(css) {
   var newCss = fs.readFileSync(css).toString();
   var mqCss = siphon(newCss);
@@ -133,6 +109,24 @@ function inliner(css) {
     });
 
   return pipe();
+}
+
+// Start a server with LiveReload to preview the site in
+function server(done) {
+  browser.init({
+    server: "dist",
+    startPath: "/index.html",
+    reloadOnRestart: true
+  });
+  done();
+}
+
+// Watch for file changes
+function watch() {
+  gulp.watch('src/pages/**/*.html').on('all', gulp.series(pages, inline, browser.reload));
+  gulp.watch(['src/layouts/**/*', 'src/partials/**/*']).on('all', gulp.series(resetPages, pages, inline, browser.reload));
+  gulp.watch(['../scss/**/*.scss', 'src/assets/scss/**/*.scss']).on('all', gulp.series(resetPages, sass, pages, inline, browser.reload));
+  gulp.watch('src/assets/img/**/*').on('all', gulp.series(images, browser.reload));
 }
 
 // Copy and compress into Zip
